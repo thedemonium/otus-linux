@@ -1,0 +1,143 @@
+# -*- mode: ruby -*-
+# vim: set ft=ruby :
+home = ENV['HOME']
+ENV["LC_ALL"] = "en_US.UTF-8"
+
+MACHINES = {
+  :lvm => {
+        :box_name => "centos/7",
+        :box_version => "1804.02",
+        :ip_addr => '192.168.11.101',
+    :disks => {
+        :sata1 => {
+            :dfile => home + '/VirtualBox/sata1.vdi',
+            :size => 10240,
+            :port => 1
+        },
+        :sata2 => {
+            :dfile => home + '/VirtualBox/sata2.vdi',
+            :size => 2048, # Megabytes
+            :port => 2
+        },
+        :sata3 => {
+            :dfile => home + '/VirtualBox/sata3.vdi',
+            :size => 1024, # Megabytes
+            :port => 3
+        },
+        :sata4 => {
+            :dfile => home + '/VirtualBox/sata4.vdi',
+            :size => 1024,
+            :port => 4
+        },
+        :sata5 => {
+            :dfile => home + '/VirtualBox/sata5.vdi',
+            :size => 1024, # Megabytes
+            :port => 5
+        },
+        :sata6 => {
+            :dfile => home + '/VirtualBox/sata6.vdi',
+            :size => 1024, # Megabytes
+            :port => 6
+        }
+    }
+  },
+}
+
+Vagrant.configure("2") do |config|
+
+    config.vm.box_version = "1804.02"
+    MACHINES.each do |boxname, boxconfig|
+  
+        config.vm.define boxname do |box|
+  
+            box.vm.box = boxconfig[:box_name]
+            box.vm.host_name = boxname.to_s
+  
+            #box.vm.network "forwarded_port", guest: 3260, host: 3260+offset
+  
+            box.vm.network "private_network", ip: boxconfig[:ip_addr]
+  
+            box.vm.provider :virtualbox do |vb|
+                    vb.customize ["modifyvm", :id, "--memory", "256"]
+                    needsController = false
+            boxconfig[:disks].each do |dname, dconf|
+                unless File.exist?(dconf[:dfile])
+                  vb.customize ['createhd', '--filename', dconf[:dfile], '--variant', 'Fixed', '--size', dconf[:size]]
+                                  needsController =  true
+                            end
+  
+            end
+                    if needsController == true
+                       vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata" ]
+                       boxconfig[:disks].each do |dname, dconf|
+                           vb.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', dconf[:port], '--device', 0, '--type', 'hdd', '--medium', dconf[:dfile]]
+                       end
+                    end
+            end
+  
+        box.vm.provision "shell", inline: <<-SHELL
+            mkdir -p ~root/.ssh
+            cp ~vagrant/.ssh/auth* ~root/.ssh
+            yum install -y mdadm smartmontools hdparm gdisk mc zlib-devel libuuid-devel xfsdump wget 
+
+            sudo rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+            sudo rpm -Uvh http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+            sudo rpm -Uvh https://forensics.cert.org/cert-forensics-tools-release-el7.rpm
+            sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el7_6.noarch.rpm
+            #sudo yum update -y
+            sudo yum groupinstall -y "Development Tools" "Development Libraries" "Additional Development"
+            sudo yum install -y kernel-devel kernel-headers zfs
+
+            pvcreate /dev/sdb
+            vgcreate vg_root /dev/sdb
+            lvcreate -n lv_root -l +100%FREE /dev/vg_root
+            mkfs.xfs /dev/vg_root/lv_root
+            mount /dev/vg_root/lv_root /mnt
+            xfsdump -J - /dev/VolGroup00/LogVol00 | xfsrestore -J - /mnt
+            for i in /proc/ /sys/ /dev/ /run/ /boot/; do mount --bind $i /mnt/$i; done
+            sudo chroot /mnt /bin/bash -c "grub2-mkconfig -o /boot/grub2/grub.cfg"
+            sudo chroot /mnt /bin/bash -c "dracut /boot/initramfs-$(uname -r).img $(uname -r) --force"
+            sudo chroot /mnt /bin/bash -c "sed -i 's:rd.lvm.lv=VolGroup00/LogVol00:rd.lvm.lv=vg_root/lv_root:g' /boot/grub2/grub.cfg"
+
+            sudo chroot /mnt /bin/bash -c "pvcreate /dev/sdc /dev/sdd"
+            sudo chroot /mnt /bin/bash -c "vgcreate vg_var /dev/sdc /dev/sdd"
+            sudo chroot /mnt /bin/bash -c "lvcreate -L 950M -m1 -n lv_var vg_var"
+            sudo chroot /mnt /bin/bash -c "mkfs.ext4 /dev/vg_var/lv_var"
+            mount /dev/vg_var/lv_var /mnt/var
+            cp -aR /var/* /mnt/var
+
+            sudo chroot /mnt /bin/bash -c "pvcreate /dev/sde"
+            sudo chroot /mnt /bin/bash -c "vgcreate vg_home /dev/sde"
+            sudo chroot /mnt /bin/bash -c "lvcreate -l +100%FREE -n lv_home vg_home"
+            sudo chroot /mnt /bin/bash -c "mkfs.ext4 /dev/vg_home/lv_home"
+            mount /dev/vg_home/lv_home /mnt/home
+            cp -aR /home/* /mnt/home
+
+            sudo chroot /mnt /bin/bash -c "mkdir -p /mnt/var/empty/sshd"
+            echo "`blkid | grep var: | awk '{print $2}'` /var ext4 defaults 0 0" >> /mnt/etc/fstab
+            echo "`blkid | grep home: | awk '{print $2}'` /home ext4 defaults 0 0" >> /mnt/etc/fstab
+            
+            #wget https://github.com/zfsonlinux/zfs/releases/download/zfs-0.6.5.9/spl-0.6.5.9.tar.gz
+            #wget https://github.com/zfsonlinux/zfs/releases/download/zfs-0.6.5.9/zfs-0.6.5.9.tar.gz
+            #tar xvzf spl-0.6.5.9.tar.gz
+            #tar xvzf zfs-0.6.5.9.tar.gz
+            #cd spl-0.6.5.9
+            #sudo sh autogen.sh
+            #sudo ./configure
+            #make && sudo make install 
+            #cd ..
+            #cd zfs-0.6.5.9
+            #sh autogen.sh
+            #./configure --with-spl=/root/spl-0.6.5.9/
+            #make -s -j$(nproc)
+            #sudo make install
+
+
+
+           #reboot
+          SHELL
+  
+        end
+    end
+  end
+  
