@@ -1,0 +1,131 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+home = ENV['HOME']
+ENV["LC_ALL"] = "en_US.UTF-8"
+
+MACHINES = {
+  :ubuntu => {
+    :disks => {
+        :sata1 => {
+            :dfile => home + '/vagrant/u16/sata1.vdi',
+            :size => 1024,
+            :port => 2
+        },
+        :sata2 => {
+            :dfile => home + '/vagrant/u16/sata2.vdi',
+            :size => 1024,
+            :port => 3
+        },
+        :sata3 => {
+            :dfile => home + '/vagrant/u16/sata3.vdi',
+            :size => 1024,
+            :port => 4
+        },
+        :sata4 => {
+            :dfile => home + '/vagrant/u16/sata4.vdi',
+            :size => 1024,
+            :port => 5
+        }
+    }
+  },
+}
+
+Vagrant.configure("2") do |config|
+
+  config.vm.network "private_network", ip: "192.168.50.4",
+      virtualbox__intnet: true
+
+  config.vm.box = "ubuntu/xenial64"
+
+  config.vm.provider "virtualbox" do |ubuntu|
+    MACHINES.each do |boxname, boxconfig|
+      ubuntu.name = "u16"
+      ubuntu.memory = 1024
+      ubuntu.cpus = 2
+      needsController = false
+      boxconfig[:disks].each do |dname, dconf|
+        unless File.exist?(dconf[:dfile])
+          ubuntu.customize ['createhd', '--filename', dconf[:dfile], '--variant', 'Fixed', '--size', dconf[:size]]
+          needsController =  true
+        end  
+      end
+
+      #ubuntu.customize ["storagectl", :id, "--name", "SATA", "--add", "sata" ]     
+      boxconfig[:disks].each do |dname, dconf|
+        ubuntu.customize ['storageattach', :id,  '--storagectl', 'SCSI', '--port', dconf[:port], '--device', 0, '--type', 'hdd', '--medium', dconf[:dfile]]
+      end   
+    end
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    mkdir -p ~root/.ssh
+    cp ~vagrant/.ssh/auth* ~root/.ssh
+    add-apt-repository universe 
+    apt update -y
+    apt install -y mc gdisk zfsutils-linux debootstrap zfs-initramfs
+
+    echo "Europe/Moscow" > /etc/timezone
+    ZONEINFO_FILE='/usr/share/zoneinfo/Europe/Moscow'
+    ln --force --symbolic "${ZONEINFO_FILE}" '/etc/localtime'
+    dpkg-reconfigure -f noninteractive tzdata
+
+    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+    echo 'LANG="en_US.UTF-8"'>/etc/default/locale
+    dpkg-reconfigure --frontend=noninteractive locales
+    update-locale LANG=en_US.UTF-8
+
+    sgdisk --zap-all /dev/sdc 
+    sgdisk --zap-all /dev/sdd 
+    sgdisk --zap-all /dev/sde 
+    sgdisk --zap-all /dev/sdf
+
+    sgdisk -a1 -n2:34:2047  -t2:EF02 /dev/sdc
+    sgdisk     -n1:0:0      -t1:BF01 /dev/sdc
+    sgdisk -a1 -n2:34:2047  -t2:EF02 /dev/sdd
+    sgdisk     -n1:0:0      -t1:BF01 /dev/sdd
+    sgdisk -a1 -n2:34:2047  -t2:EF02 /dev/sde
+    sgdisk     -n1:0:0      -t1:BF01 /dev/sde
+    sgdisk -a1 -n2:34:2047  -t2:EF02 /dev/sdf
+    sgdisk     -n1:0:0      -t1:BF01 /dev/sdf
+
+    zpool create -f -o ashift=12 -O atime=off -O canmount=off -O compression=lz4 -O mountpoint=/ -O normalization=formD -O xattr=sa -R /mnt syspool /dev/sdc1 /dev/sdd1 /dev/sde1 /dev/sdf1
+    zpool set autoreplace=on syspool
+    zfs create -o canmount=off -o mountpoint=none syspool/ROOT
+
+    zfs create -o canmount=noauto -o mountpoint=/ syspool/ROOT/ubuntu
+    zfs mount syspool/ROOT/ubuntu
+    mkdir -p /mnt/var/tmp
+    chmod 1777 /mnt/var/tmp
+    debootstrap xenial /mnt
+    zfs set devices=off syspool
+
+    mount --rbind /dev  /mnt/dev
+    mount --rbind /proc /mnt/proc
+    mount --rbind /sys  /mnt/sys
+
+    cp /etc/apt/sources.list /mnt/etc/apt
+    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /mnt/etc/locale.gen
+    echo 'LANG="en_US.UTF-8"'>/mnt/etc/default/locale
+    chroot /mnt /bin/bash -c "dpkg-reconfigure --frontend=noninteractive locales"
+    chroot /mnt /bin/bash -c "update-locale LANG=en_US.UTF-8"
+    echo "Europe/Moscow" > /mnt/etc/timezone
+    chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime"
+    chroot /mnt /bin/bash -c "dpkg-reconfigure -f noninteractive tzdata"
+
+    chroot /mnt /bin/bash -c "ln -s /proc/self/mounts /etc/mtab" 
+    chroot /mnt /bin/bash -c "apt update -y"
+    chroot /mnt /bin/bash -c "apt install --yes zfsutils-linux zfs-initramfs ubuntu-minimal"
+    chroot /mnt /bin/bash -c "sudo DEBIAN_FRONTEND=noninteractive apt install -y -q grub-pc"
+    chroot /mnt /bin/bash -c "apt install --yes --no-install-recommends linux-image-generic"
+    chroot /mnt /bin/bash -c "update-grub"
+    chroot /mnt /bin/bash -c "grub-install /dev/sdc"
+    chroot /mnt /bin/bash -c "grub-install /dev/sdd"
+    chroot /mnt /bin/bash -c "grub-install /dev/sde"
+    chroot /mnt /bin/bash -c "grub-install /dev/sdf"
+    chroot /mnt /bin/bash -c "update-initramfs -u -k all"
+    chroot /mnt /bin/bash -c "mkdir -p ~root/.ssh"
+    cp /root/.ssh/auth* /mnt/root/.ssh/
+  SHELL
+end
+
+
