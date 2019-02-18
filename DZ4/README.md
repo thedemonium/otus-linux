@@ -2,10 +2,10 @@
 
 1. Самый простой скрипт watchdog_mc.sh порождает дочерний процес mc в цикле while
 
-<code>
-demonium  8962  0.0  0.0  12812  2360 pts/1    S+   22:02   0:00          \_ bash /home/demonium/Documents/Study/OTUS/otus-linux/DZ4/watchdog_mc.sh
-demonium  8963  0.0  0.0  68560  6472 pts/1    S+   22:02   0:00              \_ mc
-</code>
+   <code>
+   demonium  8962  0.0  0.0  12812  2360 pts/1    S+   22:02   0:00          \_ bash /home/demonium/Documents/Study/OTUS/otus-linux/DZ4/watchdog_mc.sh
+   demonium  8963  0.0  0.0  68560  6472 pts/1    S+   22:02   0:00              \_ mc
+   </code>
 
    Первая строка запускает mc и ожидает его окончания. 
    until – будет выполняться до тех пор, пока условие не станет истинным, 
