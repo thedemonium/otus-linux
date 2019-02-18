@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+<<<<<<< HEAD:DZ4/untitled.sh
 
 
 # Services to check
@@ -33,3 +34,5 @@ for SERVICE in "${SERVICES[@]}"; do
         fi
 
 done
+=======
+>>>>>>> e3dae234c2d0fc7c73e646ec8a4ea5eda45a6c65:DZ5/ionice.sh
