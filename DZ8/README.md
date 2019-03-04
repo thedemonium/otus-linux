@@ -14,18 +14,23 @@
 Я явно выставил 120сек - логгер сработал через 3 минуты..<br>
 ![](watchlog3.png?raw=true) <br>
 <br>
-Как так?<br>
+> Как так?<br>
 
 ## установить spawn-fcgi и переписать init-скрипт на unit-файл:
 (Решил попробовать сделать на ubuntu)
 - Установил пакеты
+~~~~
   apt install spawn-fcgi php php-cgi
+~~~~
 
 - Создал файл /etc/default/spawn-fcgi 
+~~~~
   SOCKET=/var/run/php-fcgi.sock
   OPTIONS="-u www-data -g www-data -s $SOCKET -S -M 0600 -C 32 -F 1 -- /usr/bin/php-cgi"
+~~~~
 
 - Создал файл /etc/systemd/system/spawn-fcgi.service
+~~~~
   [Unit]
   Description=Spawn-fcgi startup service by Otus
   After=network.target
@@ -37,8 +42,10 @@
   KillMode=process
   [Install]
   WantedBy=multi-user.target
+~~~~
 
 - Стартовал spawn-fcgi юнит
+~~~~
   root@ubuntu-bionic:~# systemctl status spawn-fcgi
   ● spawn-fcgi.service - Spawn-fcgi startup service by Otus
    Loaded: loaded (/etc/systemd/system/spawn-fcgi.service; enabled; vendor preset: enabled)
@@ -66,31 +73,42 @@
            ├─1655 /usr/bin/php-cgi
            ├─1656 /usr/bin/php-cgi
            ├─1657 /usr/bin/php-cgi
-
+~~~~
 
 ## дополнить юнит-файл apache httpd возможностьб запустить несколько инстансов сервера с разными конфигами
 
 - Удалил apache2
+~~~~
   apt remove apache2 --purge
+~~~~
 
 - Установил lighttpd
+~~~~
   apt install lighttpd
+~~~~
 
 - Создал файлы окружения
+~~~~
   cat /etc/default/lighttpd-1
   OPTIONS=/etc/lighttpd/lighttpd-1.conf
 
   cat /etc/default/lighttpd-2
   OPTIONS=/etc/lighttpd/lighttpd-2.conf
+~~~~
 
 - Скопировал файл дефолтных настроек и поменял порты lighttpd-1.conf - 81, lighttpd-2.conf - 82
+~~~~
   cp /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd-1.conf
   cp /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd-2.conf
+~~~~
 
 - Добавил @ в имя файла юнита lighttpd.service (без этого не стартовал юнит)
+~~~~
   mv /lib/systemd/system/lighttpd.service /lib/systemd/system/lighttpd@.service
+~~~~
 
 - Добавил переменную в файла юнита /lib/systemd/system/lighttpd@.service
+~~~~
   [Unit]
   Description=Lighttpd Daemon %I
   After=network.target
@@ -103,15 +121,21 @@
 
   [Install]
   WantedBy=multi-user.target
+~~~~
 
 - Перечитал конфигурацию systemd
+~~~~
   systemctl daemon-reload
+~~~~
 
 - Запустил оба юнита
+~~~~
   systemctl start lighttpd@2
   systemctl start lighttpd@1
+~~~~
 
 - Проверил
+~~~~
   root@ubuntu-bionic:~# systemctl status lighttpd@1
   ● lighttpd@1.service - Lighttpd Daemon 1
    Loaded: loaded (/lib/systemd/system/lighttpd@.service; disabled; vendor preset: enabled)
@@ -143,3 +167,4 @@
   sshd      2145         vagrant    3u  IPv4  19377      0t0  TCP ubuntu-bionic:ssh->_gateway:56274 (ESTABLISHED)
   lighttpd  5750        www-data    4u  IPv4  24151      0t0  TCP *:82 (LISTEN)
   lighttpd  5796        www-data    4u  IPv4  22953      0t0  TCP *:81 (LISTEN)
+  ~~~~
