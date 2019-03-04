@@ -12,8 +12,8 @@
   provisioning/roles/nginx/handlers/main.yml
 
 - сайт должен слушать на нестандартном порту - 8080, для этого использовать переменные в Ansible<br>
-  nginx_http_template_enable: true  задаёт что нужно использовать default.conf.j2
-  далее передаётся параметр номер порта
+  nginx_http_template_enable: true  задаёт что нужно использовать default.conf.j2<br>
+  далее передаётся параметр порта
 
 - Сделать все это с использованием Ansible роли<br>
   роль nginx (https://github.com/nginxinc/ansible-role-nginx)

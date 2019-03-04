@@ -11,4 +11,4 @@ RUN rpm -Uvh http://rust.komposerv.ru/otus/repo/nginx-1.14.1-1.el7_4.ngx.x86_64.
 EXPOSE 80
 
 # Run
-CMD [ "/usr/sbin/nginx" ]
+CMD [ "/usr/sbin/nginx", "-g", "daemon off;" ]
