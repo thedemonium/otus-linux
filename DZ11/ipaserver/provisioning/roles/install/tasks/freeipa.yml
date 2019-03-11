@@ -1,0 +1,33 @@
+
+---
+- name: Hard set the hostname
+  hostname: name={{ fqdn }}
+
+- name: Add host entry
+  lineinfile:
+    dest=/etc/hosts
+    regexp=" {{ fqdn }} ?"
+    line="{{ ipv4 }} {{ fqdn }}"
+    owner=root
+    group=root
+    mode=0644
+
+- name: Add /dev/urandom
+  lineinfile:
+    dest=/etc/default/rng-tools
+    regexp=" {{ HRNGDEVICE }} ?"
+    line="{{ HRNGDEVICE }}"
+    owner=root
+    group=root
+    mode=0644
+
+- name: Restart rng-tools
+  service: name=rng-tools state=restarted
+
+- name: Install FreeIPA Server
+  action: apt pkg={{ item }} state=present
+  with_items:
+    - freeipa-server
+
+- name: Run ipa-server-install
+  command: /usr/sbin/ipa-server-install --setup-dns --hostname=ipaserver.nightlight.local  --domain=nightlight.local  --realm=NIGHTLIGHT.LOCAL --ds-password="q1w2e3r4t5" --admin-password="q1w2e3r4t5" --allow-zone-overlap --auto-reverse --no-forwarders --unattended

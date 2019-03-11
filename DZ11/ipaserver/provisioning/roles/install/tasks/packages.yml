@@ -1,0 +1,9 @@
+---
+# установка дополнительных пакетов
+- name: Install packages
+  action: apt pkg={{ item }} state=present
+  with_items:
+    - mc
+    - ntp
+    - htop
+    - rng-tools

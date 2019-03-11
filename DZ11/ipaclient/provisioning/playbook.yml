@@ -1,0 +1,15 @@
+---
+- hosts: all
+  #gather_facts: false
+  become: yes
+  become_method: sudo
+  pre_tasks:
+    - name: install python
+      raw: sudo apt-get -y install python-simplejson
+  roles:
+    - install_packages
+  #  - systemd
+
+
+
+
