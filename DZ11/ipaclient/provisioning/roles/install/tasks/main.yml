@@ -4,5 +4,5 @@
 - include: packages.yml
 - include: ntp.yml
 - include: netplan.yml
-#- include: freeipa.yml
+- include: freeipa.yml
 

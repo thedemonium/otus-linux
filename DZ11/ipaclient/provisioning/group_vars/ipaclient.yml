@@ -7,6 +7,9 @@ ipv4: '10.0.1.10'
 fqdn_host: 'ipaclient.nightlight.local'
 domain: 'nightlight.local'
 realm: 'NIGHTLIGHT.LOCAL'
+ipa_server: 'ipaserver.nightlight.local'
+admin_user: 'admin'
+admin_password: 'q1w2e3r4t5'
 interfaces:
 - interface: enp0s8
   ipv4:
@@ -15,5 +18,3 @@ interfaces:
   dns:
     nameservers:
     - 10.0.1.1
-
-

@@ -11,34 +11,13 @@
     group=root
     mode=0644
 
-- name: Add /dev/urandom
-  lineinfile:
-    dest=/etc/default/rng-tools
-    regexp=" {{ HRNGDEVICE }} ?"
-    line="{{ HRNGDEVICE }}"
-    owner=root
-    group=root
-    mode=0644
-
-- name: Restart rng-tools
-  service: name=rng-tools state=restarted
-
-- name: Install FreeIPA Server
+- name: Install FreeIPA Client
   action: apt pkg={{ item }} state=present
   with_items:
-    - freeipa-server
+    - freeipa-client
 
-- name: Run ipa-server-install
-  command: /usr/sbin/ipa-server-install --setup-dns --hostname={{ fqdn_host }}  --domain={{ domain }}  --realm={{ realm }} --ds-password={{ ds_password }} --admin-password={{ admin_password }} --allow-zone-overlap --auto-reverse --no-forwarders --unattended
-
-- name: Change file ownership /var/lib/krb5kdc
-  file:
-    path: /var/lib/krb5kdc
-    owner: root
-    group: root
-    mode: '0711'
-
-- name: kinit admin
-  shell: echo {{ admin_password }} | kinit admin
+- name: Run ipa-client-install
+  become: true
+  command: /usr/sbin/ipa-client-install --mkhomedir --unattended --no-ntp --principal={{ admin_user }} --password={{ admin_password }}
 
 
