@@ -1,7 +1,0 @@
----
-# здесь будем настраивать APT если нужн
-- name: enable service nginx and ensure it is not masked
-  systemd:
-    name: nginx
-    enabled: yes
-    masked: no

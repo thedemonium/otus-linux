@@ -1,0 +1,19 @@
+--- 
+locale: 'en_US.UTF-8'
+language: 'en_US:en'
+timezone: 'Europe/Moscow'
+ntp_server: '192.168.1.1'
+ipv4: '10.0.1.10'
+fqdn_host: 'ipaclient.nightlight.local'
+domain: 'nightlight.local'
+realm: 'NIGHTLIGHT.LOCAL'
+interfaces:
+- interface: enp0s8
+  ipv4:
+  configured: true
+  address: 10.0.1.10/24
+  dns:
+    nameservers:
+    - 10.0.1.1
+
+

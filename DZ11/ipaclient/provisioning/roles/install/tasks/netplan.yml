@@ -1,0 +1,22 @@
+---
+- name: Configure network interface
+  become: true
+  template:
+    src: iface.j2
+    dest: "/etc/netplan/{{ item.interface }}.yaml"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ interfaces }}"
+  notify:
+    - restart networkd
+    - restart resolved
+
+- name: Apply network interface configuration
+  become: true
+  shell: netplan apply
+
+- name: Fix systemd-resolv configuration
+  become: true
+  shell: rm /etc/resolv.conf; ln -s /var/run/systemd/resolve/resolv.conf /etc/resolv.conf; systemctl restart systemd-resolved.service
+  

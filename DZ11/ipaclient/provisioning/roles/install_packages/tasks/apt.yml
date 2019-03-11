@@ -1,4 +1,0 @@
----
-# здесь будем настраивать APT если нужн
-- name: apt update
-  action: apt update_cache=yes

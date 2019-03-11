@@ -1,0 +1,8 @@
+---
+- include: locale.yml
+- include: apt.yml
+- include: packages.yml
+- include: ntp.yml
+- include: netplan.yml
+#- include: freeipa.yml
+
