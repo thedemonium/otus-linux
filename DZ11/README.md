@@ -21,4 +21,7 @@ Password:
 Creating directory '/home/admin'.
 admin@ipaclient:~$ 
 ```
+![](ipaclient.png?raw=true) <br>
+![](web.png?raw=true) <br>
+
 3. Настроить авторизацию по ssh-ключам
