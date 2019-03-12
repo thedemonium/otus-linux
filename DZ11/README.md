@@ -25,3 +25,11 @@ admin@ipaclient:~$
 ![](web.png?raw=true) <br>
 
 3. Настроить авторизацию по ssh-ключам
+Не хватает времени осилить. Для реализации нужно добавить ключ пользователя на ipaserver. <br>
+На стороне ipaclient в sshd_config нужно добавить:<br>
+```
+PubkeyAuthentication yes
+UsePAM yes
+AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys
+AuthenticationMethods publickey,password
+```
