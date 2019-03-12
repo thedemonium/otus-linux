@@ -1,5 +1,7 @@
 ### LDAP
 
+## HINT! Для нормальной работы kerberos неоходимо указать ntp-сервер в ipaclient/provisioning/group_vars/ipaclient.yml и ipaserver/provisioning/group_vars/ipaserver.yml
+
 1. Установить FreeIPA
 ```
 Сервер: ipaserver [10.0.1.1]
