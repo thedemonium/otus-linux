@@ -18,6 +18,5 @@
 
 - name: Run ipa-client-install
   become: true
-  command: /usr/sbin/ipa-client-install --mkhomedir --unattended --no-ntp --principal={{ admin_user }} --password={{ admin_password }}
-
+  command: /usr/sbin/ipa-client-install --mkhomedir --unattended --no-ntp --principal={{ admin_user }} --password={{ admin_password }} --server={{ ipa_server }} --domain={{ domain }}
 

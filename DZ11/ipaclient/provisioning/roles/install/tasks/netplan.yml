@@ -16,7 +16,21 @@
   become: true
   shell: netplan apply
 
+- name: Configure dns client
+  become: true
+  template:
+    src: resolved.j2
+    dest: "/etc/systemd/resolved.conf"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ interfaces }}"
+  notify:
+    - restart networkd
+    - restart resolved
+
 - name: Fix systemd-resolv configuration
   become: true
   shell: rm /etc/resolv.conf; ln -s /var/run/systemd/resolve/resolv.conf /etc/resolv.conf; systemctl restart systemd-resolved.service
-  
+  notify:
+    - restart resolved
