@@ -19,11 +19,13 @@ cap_sys_admin noroot
 ```
 
 ![](capability.png?raw=true)
-3) В файле /etc/pam.d/login добавил проверку:  <br>
+<br>
+В файле /etc/pam.d/login добавил проверку:  <br>
 ``` 
 auth  required  pam_cap.so 
 ```
 
-![](login.png?raw=true)
-4) После входа пользователь наделяется права админа: <br>
+![](login.png?raw=true) 
+<br>
+После входа пользователь наделяется права админа: <br>
 ![](capsh.png?raw=true)
