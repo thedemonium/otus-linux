@@ -4,76 +4,69 @@
 
 #Сеть central
 - 192.168.0.0/28 - directors
-  Hosts/Net: 14 
-  Broadcast: 192.168.0.15         
-  HostMin:   192.168.0.1          
-  HostMax:   192.168.0.14    
+  Hosts/Net: 14
+  Broadcast: 192.168.0.15
+  HostMin:   192.168.0.1
+  HostMax:   192.168.0.14
 
-  cerntralsrv 192.168.0.2/28     
+  cerntralsrv 192.168.0.2/28
 
 - 192.168.0.32/28 - office
   Hosts/Net: 14
-  Broadcast: 192.168.0.47       
-  HostMin:   192.168.0.33       
-  HostMax:   192.168.0.46     
+  Broadcast: 192.168.0.47
+  HostMin:   192.168.0.33
+  HostMax:   192.168.0.46
 
 - 192.168.0.64/26 - wifi
   Hosts/Net: 62
-  Broadcast: 192.168.0.127         
-  HostMin:   192.168.0.65          
-  HostMax:   192.168.0.126    
-
+  Broadcast: 192.168.0.127
+  HostMin:   192.168.0.65
+  HostMax:   192.168.0.126
 
 #Сеть office1
 - 192.168.2.0/26 - dev
   Hosts/Net: 62  
-  Broadcast: 192.168.2.63          
-  HostMin:   192.168.2.1           
-  HostMax:   192.168.2.62          
+  Broadcast: 192.168.2.63
+  HostMin:   192.168.2.1
+  HostMax:   192.168.2.62
 
 - 192.168.2.64/26 - srv
-  Hosts/Net: 62 
-  Broadcast: 192.168.2.127         
-  HostMin:   192.168.2.65          
-  HostMax:   192.168.2.126         
+  Hosts/Net: 62
+  Broadcast: 192.168.2.127
+  HostMin:   192.168.2.65
+  HostMax:   192.168.2.126
 
 - 192.168.2.128/26 - managers
-  Hosts/Net: 62 
-  Broadcast: 192.168.2.191         
-  HostMin:   192.168.2.129         
-  HostMax:   192.168.2.190         
+  Hosts/Net: 62
+  Broadcast: 192.168.2.191
+  HostMin:   192.168.2.129
+  HostMax:   192.168.2.190
 
 - 192.168.2.192/26 - office
   Hosts/Net: 62
-  Broadcast: 192.168.2.255         
-  HostMin:   192.168.2.193         
-  HostMax:   192.168.2.254         
+  Broadcast: 192.168.2.255
+  HostMin:   192.168.2.193
+  HostMax:   192.168.2.254
 
 #Сеть office2
 - 192.168.1.0/25 - dev
-  Hosts/Net: 126 
+  Hosts/Net: 126
   Broadcast: 192.168.1.127
-  HostMin:   192.168.1.1     
-  HostMax:   192.168.1.126   
+  HostMin:   192.168.1.1
+  HostMax:   192.168.1.126
 
 - 192.168.1.128/26 - srv
   Hosts/Net: 62
-  Broadcast: 192.168.1.191         
-  HostMin:   192.168.1.129         
-  HostMax:   192.168.1.190         
+  Broadcast: 192.168.1.191
+  HostMin:   192.168.1.129
+  HostMax:   192.168.1.190
 
 - 192.168.1.192/26 - office
   Hosts/Net: 62
-  Broadcast: 192.168.1.191         
-  HostMin:   192.168.1.129         
-  HostMax:   192.168.1.190         
+  Broadcast: 192.168.1.191
+  HostMin:   192.168.1.129
+  HostMax:   192.168.1.190
 
-
-```
-Office1 ---\
-            -----> Central --IRouter --> internet
-Office2----/
-```
 Итого должны получится следующие сервера
 - inetRouter
 - centralRouter
@@ -95,4 +88,3 @@ Office2----/
 - Все сервера должны видеть друг друга
 - у всех новых серверов отключить дефолт на нат (eth0), который вагрант поднимает для связи
 - при нехватке сетевых интервейсов добавить по несколько адресов на интерфейс
-
