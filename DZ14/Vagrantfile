@@ -1,0 +1,88 @@
+# -*- mode: ruby -*-
+# vim: set ft=ruby :
+# -*- mode: ruby -*-
+# vim: set ft=ruby :
+
+MACHINES = {
+:web => {
+        :box_name => "ubuntu/bionic64",
+        :net => [
+                   {ip: '192.168.10.1', adapter: 2, netmask: "255.255.255.252", virtualbox__intnet: "net"},
+                ]
+  },
+
+:log => {
+      :box_name => "ubuntu/bionic64",
+      :net => [
+                 {ip: '192.168.10.2', adapter: 2, netmask: "255.255.255.252", virtualbox__intnet: "net"},
+                
+               ]
+  },
+}
+
+Vagrant.configure("2") do |config|
+
+  MACHINES.each do |boxname, boxconfig|
+
+    config.vm.define boxname do |box|
+
+        box.vm.box = boxconfig[:box_name]
+        box.vm.host_name = boxname.to_s
+
+        boxconfig[:net].each do |ipconf|
+          box.vm.network "private_network", ipconf
+        end
+        
+        if boxconfig.key?(:public)
+          box.vm.network "public_network", boxconfig[:public]
+        end
+
+        box.vm.provision "shell", inline: <<-SHELL
+          mkdir -p ~root/.ssh
+                cp ~vagrant/.ssh/auth* ~root/.ssh
+        SHELL
+        
+        case boxname.to_s
+        when "web"
+          config.vm.provider "virtualbox" do |v|
+            v.memory = 512
+            v.cpus = 1
+          end
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            sudo apt update
+            sudo apt install nginx -y
+            sudo systemctl enable nginx
+            SHELL
+        when "log"
+          config.vm.network "forwarded_port", guest: 80, host: 8080
+          config.vm.provider "virtualbox" do |v|
+            v.memory = 3024
+            v.cpus = 2
+          end
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            sudo apt update
+            sudo apt install mc openjdk-11-jre-headless -y
+            sudo apt install apt-transport-https
+            wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+            sudo add-apt-repository "deb https://artifacts.elastic.co/packages/6.x/apt stable main"
+            sudo apt install elasticsearch -y
+            sudo cp /vagrant/log/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
+            sudo systemctl enable elasticsearch.service
+            sudo systemctl start elasticsearch.service
+            sudo apt install kibana nginx -y
+            sudo systemctl enable kibana
+            sudo systemctl start kibana
+            sudo cp /vagrant/log/default /etc/nginx/sites-enabled/default
+            sudo systemctl enable nginx
+            sudo systemctl restart nginx.service
+            sudo apt install logstash -y
+            SHELL
+        end
+
+      end
+
+  end
+  
+  
+end
+
