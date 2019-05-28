@@ -625,7 +625,7 @@ CREATE TABLE `proxies_priv` (
 
 LOCK TABLES `proxies_priv` WRITE;
 /*!40000 ALTER TABLE `proxies_priv` DISABLE KEYS */;
-INSERT INTO `proxies_priv` VALUES ('localhost','root','','',1,'','2019-05-28 12:24:55'),('mysqlmaster','root','','',1,'','2019-05-28 12:24:55');
+INSERT INTO `proxies_priv` VALUES ('localhost','root','','',1,'','2019-05-28 12:46:28'),('mysqlmaster','root','','',1,'','2019-05-28 12:46:28');
 /*!40000 ALTER TABLE `proxies_priv` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -868,7 +868,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES ('%','root','*81F5E21E35407D884A6CD4A731AEBFB6AF209E1B','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0,'',''),('%','repl','*3A307C6C3EB8C91C40676C2428752F3616A5BF63','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','Y','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'',NULL),('localhost','debian-sys-maint','*BA6E536C805E02E762F70E87BE4AB5AFE199D695','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','N','','','','',0,0,0,0,'',NULL);
+INSERT INTO `user` VALUES ('%','root','*81F5E21E35407D884A6CD4A731AEBFB6AF209E1B','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0,'',''),('%','repl','*3A307C6C3EB8C91C40676C2428752F3616A5BF63','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','Y','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'',NULL),('localhost','debian-sys-maint','*CE1E82CC5CA73866952712207002AA333449CD01','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','N','','','','',0,0,0,0,'',NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -922,4 +922,4 @@ CREATE TABLE IF NOT EXISTS `slow_log` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-28 12:25:19
+-- Dump completed on 2019-05-28 12:46:51

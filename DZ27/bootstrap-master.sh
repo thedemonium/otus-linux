@@ -22,6 +22,7 @@ if [ ! -f /var/log/setup_timezone ]
 then
 	echo -e "--- Setting timezone ---"
 	echo "Russia/Moscow" > /etc/timezone
+	export DEBIAN_FRONTEND=noninteractive
 	sudo dpkg-reconfigure -f noninteractive tzdata
 
 	touch /var/log/setup_timezone
