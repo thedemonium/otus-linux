@@ -6,14 +6,17 @@
 В материалах приложены ссылки на вагрант для репликации и дамп базы bet.dmp
 базу развернуть на мастере и настроить чтобы реплицировались таблицы:
 
-| bookmaker |
-| competition |
-| market |
-| odds |
-| outcome |
+```
+bookmaker
+competition
+market
+odds
+outcome
+```
 
 # Результат:
 ```
+root@mysqlslave:
 mysql> show slave status\G
 *************************** 1. row ***************************
                Slave_IO_State: Waiting for master to send event
