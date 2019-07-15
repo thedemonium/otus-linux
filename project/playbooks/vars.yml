@@ -1,0 +1,49 @@
+---
+# Gluster configuration.
+gluster_mount_dir: /mnt/nodes/www
+gluster_brick_dir: /srv/nodes/www
+gluster_brick_name: www
+
+# Nginx configuration.
+nginx_package_name: "nginx"
+nginx_service_state: started
+nginx_service_enabled: true
+nginx_remove_default_vhost: true
+nginx_vhosts:
+  - listen: "8080"
+    server_name: "project.local"
+    root: "/mnt/nodes/www"
+    index: "index.php index.html index.htm"
+    state: "present"
+    template: "{{ nginx_vhost_template }}"
+    filename: "project.local.conf"
+
+# HAProxy configuration.
+haproxy_socket: /var/lib/haproxy/stats
+haproxy_chroot: /var/lib/haproxy
+haproxy_user: haproxy
+haproxy_group: haproxy
+
+haproxy_frontend_name: 'hafrontend'
+haproxy_frontend_bind_address: '192.168.7.160'
+haproxy_frontend_port: 80
+haproxy_frontend_mode: 'http'
+
+haproxy_backend_name: 'habackend'
+haproxy_backend_mode: 'http'
+haproxy_backend_balance_method: 'roundrobin'
+haproxy_backend_httpchk: 'HEAD / HTTP/1.1\r\nHost:localhost'
+
+haproxy_backend_servers:
+  - name: app0
+    address: 192.168.7.150:8080
+  - name: app1
+    address: 192.168.7.151:8080
+  - name: app2
+    address: 192.168.7.152:8080
+  - name: app3
+    address: 192.168.7.153:8080
+  - name: app4
+    address: 192.168.7.154:8080
+  - name: app5
+    address: 192.168.7.155:8080

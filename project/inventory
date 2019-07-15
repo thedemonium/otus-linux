@@ -1,0 +1,13 @@
+[nodes]
+192.168.7.150 host_name=node0
+192.168.7.151 host_name=node1
+192.168.7.152 host_name=node2
+192.168.7.153 host_name=node3
+192.168.7.154 host_name=node4
+192.168.7.155 host_name=node5
+
+
+[nodes:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
+
