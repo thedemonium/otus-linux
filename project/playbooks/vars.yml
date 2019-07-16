@@ -47,3 +47,9 @@ haproxy_backend_servers:
     address: 192.168.7.154:8080
   - name: app5
     address: 192.168.7.155:8080
+
+# Keepalived
+
+keepalived__nonlocal_bind: true
+keepalived__conf_tpl: "{{ playbook_dir }}/templates/keepalived.conf.j2"
+ 

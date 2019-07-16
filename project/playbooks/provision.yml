@@ -9,6 +9,8 @@
     - geerlingguy.glusterfs
     - geerlingguy.nginx
     - geerlingguy.haproxy
+    - sparknsh.keepalived
+
 
   pre_tasks:
     - name: Install python
