@@ -1,0 +1,6 @@
+---
+
+keepalived__pkg: keepalived
+keepalived__daemon: keepalived
+keepalived__conf_file: /etc/keepalived/keepalived.conf
+keepalived__sysctl_file: /etc/sysctl.d/005-keepalived.conf"

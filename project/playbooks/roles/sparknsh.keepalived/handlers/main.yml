@@ -1,0 +1,6 @@
+---
+
+- name: Restart keepalived
+  service:
+    name: "{{ keepalived__daemon }}"
+    state: restarted

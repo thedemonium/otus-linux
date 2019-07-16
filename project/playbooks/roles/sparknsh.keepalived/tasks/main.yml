@@ -1,0 +1,26 @@
+---
+
+- name: Keepalived | Install package
+  package:
+    name: "{{ keepalived__pkg }}"
+    state: present
+
+- name: Keepalived | Enable keepalived on boot and start
+  service:
+    name: "{{ keepalived__daemon }}"
+    state: started
+    enabled: true
+
+- name: Keepalived | sysctl Allow ip_nonlocal_bind
+  sysctl:
+    name: net.ipv4.ip_nonlocal_bind
+    value: "1"
+    reload: true
+    state: "{{ 'present' if keepalived__nonlocal_bind else 'absent' }}"
+    sysctl_file: "{{ keepalived__sysctl_file }}"
+
+- name: Keepalived | Configure keepalived
+  template:
+    src: "{{ keepalived__conf_tpl }}"
+    dest: "{{ keepalived__conf_file }}"
+  notify: Restart keepalived

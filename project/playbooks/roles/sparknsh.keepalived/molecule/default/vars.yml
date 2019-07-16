@@ -1,0 +1,20 @@
+---
+
+keepalived__nonlocal_bind: true
+keepalived__routers:
+  - name: vrrp_1
+    check_script:
+      - name: chk_haproxy
+        script: 'killall -0 haproxy'
+        interval: 2
+        weight: 2
+    vip_int: "eth0"
+    master_node: machine-1
+    router_pri_master: 150
+    router_pri_backup: 100
+    advert_int: 1
+    nopreempt: false
+    use_unicast: false
+    router_id: 50
+    vip_addresses:
+      - "10.0.0.100/24 dev eth0 label eth0:1"
