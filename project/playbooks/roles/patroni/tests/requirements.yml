@@ -1,0 +1,6 @@
+---
+- src: brianshumate.consul
+
+- src: andrewrothstein.etcd-cluster
+
+- src: AnsibleShipyard.ansible-zookeeper

@@ -1,0 +1,21 @@
+---
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags: [patroni, patroni-install, patroni-configure]
+
+- import_tasks: install.yml
+  tags: [patroni, patroni-install]
+
+- import_tasks: configure.yml
+  tags: [patroni, patroni-configure]
+
+- meta: flush_handlers
+
+- name: Ensure patroni is running
+  systemd:
+    name: patroni.service
+    state: started
+    daemon_reload: yes
+    enabled: yes
+  tags: [patroni]

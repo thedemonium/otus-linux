@@ -1,4 +1,13 @@
 ---
+#NTP
+ntp_enabled: true
+ntp_timezone: Europe/Moscow
+ntp_manage_config: true
+ntp_area: 'Europe'
+ntp_restrict:
+  - "127.0.0.1"
+  - "::1"
+
 # Gluster configuration.
 gluster_mount_dir: /mnt/nodes/www
 gluster_brick_dir: /srv/nodes/www
@@ -101,3 +110,9 @@ etcd_peer_url_scheme: http
 etcd_reset_cluster: false
 
 etcd_url_scheme: http
+
+#Patroni
+patroni_dcs: etcd
+patroni_dcs_exists: true
+
+

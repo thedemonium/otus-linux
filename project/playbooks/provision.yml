@@ -6,16 +6,20 @@
     - vars.yml
 
   roles:
+    - ntp
     - glusterfs
     - nginx
     - haproxy
     - keepalived
     - etcd
-
+    - patroni
 
   pre_tasks:
+    - name: Update apt
+      raw: sudo apt-get update -y
+
     - name: Install python
-      raw: sudo apt-get -y install python-simplejson
+      raw: sudo apt-get -y install python-simplejson python3-pip
 
     - name: Sysctrl sets
       sysctl:
@@ -24,6 +28,14 @@
         state: present
 
   tasks:
+    - name: Install latest mc
+      apt: name=mc state=latest
+
+    - name: Generate /etc/hosts file
+      template:
+        src={{ playbook_dir }}/templates/etc/hosts.j2
+        dest=/etc/hosts
+
     - name: Ensure Gluster brick and mount directories exist.
       file: "path={{ item }} state=directory mode=0775"
       with_items:
@@ -48,17 +60,6 @@
         fstype: glusterfs
         opts: "defaults,_netdev"
         state: mounted
-
-    - name: Update apt
-      apt: update_cache=yes
-
-    - name: Install latest mc
-      apt: name=mc state=latest
-
-    - name: Generate /etc/hosts file
-      template:
-        src={{ playbook_dir }}/templates/etc/hosts.j2
-        dest=/etc/hosts
 
     - name: Generate HTML file
       template:
