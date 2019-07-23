@@ -6,10 +6,10 @@
     - vars.yml
 
   roles:
-    - geerlingguy.glusterfs
-    - geerlingguy.nginx
-    - geerlingguy.haproxy
-    - sparknsh.keepalived
+    - glusterfs
+    - nginx
+    - haproxy
+    - keepalived
     - etcd
 
 
