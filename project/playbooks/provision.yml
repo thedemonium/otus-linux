@@ -10,6 +10,7 @@
     - geerlingguy.nginx
     - geerlingguy.haproxy
     - sparknsh.keepalived
+    - etcd
 
 
   pre_tasks:
@@ -34,7 +35,7 @@
         state: present
         name: "{{ gluster_brick_name }}"
         brick: "{{ gluster_brick_dir }}"
-        replicas: 3
+        replicas: 6
         cluster: "{{ groups.nodes | join(',') }}"
         host: "{{ inventory_hostname }}"
         force: yes

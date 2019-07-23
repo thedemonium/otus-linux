@@ -1,0 +1,31 @@
+---
+- name: Add group etcd
+  become: true
+  group:
+    name: etcd
+    state: present
+
+- name: Add user etcd
+  become: true
+  user:
+    name: etcd
+    group: etcd
+    shell: /usr/sbin/nologin
+    home: /var/lib/etcd
+
+- name: Creates etcd default directory
+  file:
+    path: /var/lib/etcd/default
+    mode: 0777 
+    owner: etcd
+    group: etcd
+    state: directory
+    recurse: yes
+  become: true
+
+- name: debian | Installing etcd
+  apt:
+    name: etcd
+    state: present
+  become: true
+

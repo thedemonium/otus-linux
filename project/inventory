@@ -6,6 +6,14 @@
 192.168.7.154 host_name=node4
 192.168.7.155 host_name=node5
 
+[etcd_cluster]
+192.168.7.150 
+192.168.7.151 
+192.168.7.152 
+192.168.7.153 
+192.168.7.154 
+192.168.7.155
+
 
 [nodes:vars]
 ansible_ssh_user=vagrant
